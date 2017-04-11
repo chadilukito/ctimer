@@ -31,8 +31,6 @@ const
 {$ENDIF}
 
 type
-  TOnTimerEvent = procedure (const Sender: TObject) of object;
-
   { TTimerThread }
 
   TTimerThread = class(TTHread)
@@ -42,7 +40,7 @@ type
     FActive: Boolean;
     FEnableEvent: TEvent;
     FID: Integer;
-    FOnTimer: TOnTimerEvent;
+    FOnTimer: TNotifyEvent;
     {$IFDEF DEBUG}
     FTraceHandle: THandle;
     {$ENDIF}
@@ -59,7 +57,7 @@ type
     property ID: Integer read FID write FID;
     property Interval: Cardinal read FInterval write FInterval;
     property Enabled: Boolean read  FEnabled write SetEnabled;
-    property OnTimer: TOnTimerEvent read FOnTimer write FOnTimer;
+    property OnTimer: TNotifyEvent read FOnTimer write FOnTimer;
     {$IFDEF DEBUG}
     property TraceHandle: THandle read FTraceHandle write FTraceHandle;
     {$ENDIF}
@@ -74,7 +72,7 @@ type
     FTH: TTimerThread;
     // interval du timer en milli-secondes
     FInterval: Cardinal;
-    FOnTimer: TOnTimerEvent;
+    FOnTimer: TNotifyEvent;
     FID: Integer;
     {$IFDEF DEBUG}
     FTraceHandle: THandle;
@@ -84,7 +82,7 @@ type
     procedure SetEnabled(AValue: Boolean);
     function GetInterval: Cardinal;
     procedure SetInterval(AValue: Cardinal);
-    procedure SetOnTimer(AValue: TOnTimerEvent);
+    procedure SetOnTimer(AValue: TNotifyEvent);
     procedure SetID(AValue: Integer);
     {$IFDEF DEBUG}
     procedure SetTraceHandle(AValue: THandle);
@@ -101,7 +99,7 @@ type
     property ID: Integer read FID write SetID;
     property Interval: Cardinal read GetInterval write SetInterval;
     property Enabled: Boolean read GetEnabled write SetEnabled;
-    property OnTimer: TOnTimerEvent read FOnTimer write SetOnTimer;
+    property OnTimer: TNotifyEvent read FOnTimer write SetOnTimer;
     {$IFDEF DEBUG}
     property TraceHandle: THandle read FTraceHandle write SetTraceHandle;
     {$ENDIF}
@@ -110,11 +108,9 @@ type
 
 implementation
 
-uses
-  {$IFDEF MSWINDOWS}
-  windows,
-  {$ENDIF}
-  LCLIntf;
+{$IFDEF MSWINDOWS}
+uses windows;
+{$ENDIF}
 
 constructor TTimerThread.Create;
 begin
@@ -320,7 +316,7 @@ begin
   FTH.Interval := AValue;
 end;
 
-procedure TCustomControlTimer.SetOnTimer(AValue: TOnTimerEvent);
+procedure TCustomControlTimer.SetOnTimer(AValue: TNotifyEvent);
 begin
   if (not Assigned(FTH)) or (FOnTimer = AValue) then
     Exit;
